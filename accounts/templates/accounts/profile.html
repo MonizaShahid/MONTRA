@@ -1,0 +1,135 @@
+{% extends 'store/base.html' %}
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4" style="background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 100%); min-height: 100vh;">
+    <!-- Messages -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert" style="border-radius: 15px; margin-bottom: 1rem;">
+                <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %} me-2"></i>
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    <!-- Custom Profile Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm" style="border-radius: 25px; background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); overflow: hidden;">
+                <div class="card-body p-5 text-white">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <div class="d-flex align-items-center">
+                                <div class="profile-avatar-large me-4" style="width: 80px; height: 80px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 2rem; border: 3px solid rgba(255,255,255,0.3);">
+                                    {% if user.profile.profile_picture %}
+                                        <img src="{{ user.profile.profile_picture.url }}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                                    {% else %}
+                                        <i class="fas fa-user"></i>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <h2 class="mb-2" style="font-weight: 700;">{{ user.username }}</h2>
+                                    <div class="d-flex align-items-center">
+                                        <div class="role-badge me-3" style="background: rgba(255,255,255,0.2); padding: 0.5rem 1rem; border-radius: 25px; font-weight: 600;">
+                                            {% if user.profile.role == 'AD' %}Administrator{% elif user.profile.role == 'EX' %}Manager{% else %}Staff Member{% endif %}
+                                        </div>
+                                        <div class="status-indicator" style="width: 12px; height: 12px; background: #10b981; border-radius: 50%; border: 2px solid white;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <a href="{% url 'user-profile-update' %}" class="btn btn-light btn-lg" style="border-radius: 15px; padding: 0.75rem 2rem; font-weight: 600; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                                <i class="fas fa-edit me-2"></i>Edit Profile
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Details Cards -->
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm" style="border-radius: 20px; background: white;">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="me-3">
+                            <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #3b82f6, #1e40af); border-radius: 15px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem;">
+                                <i class="fas fa-user"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h5 class="text-primary mb-1" style="font-weight: 700;">Personal Information</h5>
+                            <p class="text-muted mb-0 small">Your account details</p>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-details">
+                        <div class="detail-item mb-3">
+                            <div class="detail-label" style="color: #64748b; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.25rem;">Username</div>
+                            <div class="detail-value" style="color: #1e40af; font-weight: 600; font-size: 1.1rem;">{{ user.username }}</div>
+                        </div>
+                        <div class="detail-item mb-3">
+                            <div class="detail-label" style="color: #64748b; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.25rem;">Email Address</div>
+                            <div class="detail-value" style="color: #374151; font-weight: 500;">{{ user.email|default:"Not provided" }}</div>
+                        </div>
+                        <div class="detail-item mb-3">
+                            <div class="detail-label" style="color: #64748b; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.25rem;">First Name</div>
+                            <div class="detail-value" style="color: #374151; font-weight: 500;">{{ user.profile.first_name|default:"Not provided" }}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label" style="color: #64748b; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.25rem;">Last Name</div>
+                            <div class="detail-value" style="color: #374151; font-weight: 500;">{{ user.profile.last_name|default:"Not provided" }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm" style="border-radius: 20px; background: white;">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="me-3">
+                            <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 15px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem;">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h5 class="text-primary mb-1" style="font-weight: 700;">Contact Information</h5>
+                            <p class="text-muted mb-0 small">How to reach you</p>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-details">
+                        <div class="detail-item mb-3">
+                            <div class="detail-label" style="color: #64748b; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.25rem;">Phone Number</div>
+                            <div class="detail-value" style="color: #374151; font-weight: 500;">{{ user.profile.telephone|default:"Not provided" }}</div>
+                        </div>
+                        <div class="detail-item mb-3">
+                            <div class="detail-label" style="color: #64748b; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.25rem;">Account Status</div>
+                            <div class="detail-value">
+                                <span class="status-badge" style="background: #dcfce7; color: #166534; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">
+                                    <i class="fas fa-check-circle me-1"></i>Active
+                                </span>
+                            </div>
+                        </div>
+                        <div class="detail-item mb-3">
+                            <div class="detail-label" style="color: #64748b; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.25rem;">Member Since</div>
+                            <div class="detail-value" style="color: #374151; font-weight: 500;">{{ user.date_joined|date:"F d, Y" }}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label" style="color: #64748b; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.25rem;">Last Login</div>
+                            <div class="detail-value" style="color: #374151; font-weight: 500;">{{ user.last_login|date:"F d, Y g:i A"|default:"Never" }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

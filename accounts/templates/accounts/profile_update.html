@@ -1,0 +1,256 @@
+{% extends 'store/base.html' %}
+{% block title %}Edit Profile{% endblock %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4" style="background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 100%); min-height: 100vh;">
+    <!-- Custom Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm" style="border-radius: 25px; background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); overflow: hidden;">
+                <div class="card-body p-4 text-white">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <div style="width: 60px; height: 60px; background: rgba(255,255,255,0.2); border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                                        <i class="fas fa-user-edit"></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h2 class="mb-1" style="font-weight: 700; font-size: 2rem;">Edit Profile</h2>
+                                    <p class="mb-0 opacity-75">Update your personal information</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <a href="{% url 'user-profile' %}" class="btn btn-light" style="border-radius: 15px; padding: 0.5rem 1.5rem; font-weight: 600;">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Profile
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+        <div class="row justify-content-center mb-3">
+            <div class="col-lg-8 col-md-10">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert" style="border-radius: 15px;">
+                        <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %} me-2"></i>
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Profile Form -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <div class="card border-0 shadow-sm" style="border-radius: 25px; background: white;">
+                <div class="card-body p-5">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <!-- Profile Picture Section -->
+                        <div class="text-center mb-5">
+                            <div class="profile-picture-container mb-3">
+                                {% if user.profile.profile_picture %}
+                                    <img id="profile-preview" src="{{ user.profile.profile_picture.url }}" alt="Profile" class="profile-preview" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid #e2e8f0;">
+                                {% else %}
+                                    <div id="profile-preview-default" class="profile-preview" style="width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, #3b82f6, #1e40af); display: flex; align-items: center; justify-content: center; font-size: 3rem; color: white; margin: 0 auto;">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="file-upload-container">
+                                <label for="id_profile_picture" class="btn btn-outline-primary" style="border-radius: 15px; padding: 0.5rem 1.5rem; font-weight: 600;">
+                                    <i class="fas fa-camera me-2"></i>Change Photo
+                                </label>
+                                {{ p_form.profile_picture }}
+                                <div class="text-muted small mt-2">JPG, PNG or GIF. Max size 2MB.</div>
+                                {% if p_form.profile_picture.errors %}
+                                    <div class="text-danger small mt-2">{{ p_form.profile_picture.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Form Fields -->
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label" style="color: #374151; font-weight: 600; margin-bottom: 0.5rem;">Username</label>
+                                    <div class="form-control" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 0.75rem 1rem; color: #64748b;">
+                                        {{ user.username }}
+                                    </div>
+                                    <small class="text-muted">Username cannot be changed</small>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label" style="color: #374151; font-weight: 600; margin-bottom: 0.5rem;">Email Address</label>
+                                    <div class="form-control" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 0.75rem 1rem; color: #64748b;">
+                                        {{ user.email }}
+                                    </div>
+                                    <small class="text-muted">Email cannot be changed</small>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label" style="color: #374151; font-weight: 600; margin-bottom: 0.5rem;">First Name</label>
+                                    {{ p_form.first_name }}
+                                    {% if p_form.first_name.errors %}
+                                        <div class="text-danger small mt-1">{{ p_form.first_name.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label" style="color: #374151; font-weight: 600; margin-bottom: 0.5rem;">Last Name</label>
+                                    {{ p_form.last_name }}
+                                    {% if p_form.last_name.errors %}
+                                        <div class="text-danger small mt-1">{{ p_form.last_name.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label" style="color: #374151; font-weight: 600; margin-bottom: 0.5rem;">Phone Number</label>
+                                    {{ p_form.telephone }}
+                                    {% if p_form.telephone.errors %}
+                                        <div class="text-danger small mt-1">{{ p_form.telephone.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label" style="color: #374151; font-weight: 600; margin-bottom: 0.5rem;">Secondary Email</label>
+                                    {{ p_form.email }}
+                                    {% if p_form.email.errors %}
+                                        <div class="text-danger small mt-1">{{ p_form.email.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex gap-3 justify-content-center mt-5">
+                            <a href="{% url 'user-profile' %}" class="btn btn-outline-secondary" style="border-radius: 15px; padding: 0.75rem 2rem; font-weight: 600;">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary" style="border-radius: 15px; padding: 0.75rem 2rem; font-weight: 600; background: linear-gradient(135deg, #3b82f6, #1e40af); border: none;">
+                                <i class="fas fa-save me-2"></i>Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control {
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: white;
+    }
+    
+    .form-control:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        outline: none;
+    }
+    
+    .form-control:not(:focus) {
+        border-color: #e2e8f0;
+    }
+    
+    .file-upload-container input[type="file"] {
+        display: none;
+    }
+    
+    .file-upload-container input[type="checkbox"] {
+        display: none;
+    }
+    
+    .file-upload-container .helptext {
+        display: none;
+    }
+    
+    .profile-preview {
+        transition: all 0.3s ease;
+    }
+    
+    .profile-preview:hover {
+        transform: scale(1.05);
+    }
+    
+    .form-group input,
+    .form-group textarea {
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        width: 100%;
+        transition: all 0.3s ease;
+    }
+    
+    .form-group input:focus,
+    .form-group textarea:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        outline: none;
+    }
+</style>
+
+<script>
+    // Live image preview
+    document.getElementById('id_profile_picture').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const previewImg = document.getElementById('profile-preview');
+                const previewDefault = document.getElementById('profile-preview-default');
+                
+                if (previewDefault) {
+                    previewDefault.style.display = 'none';
+                }
+                
+                if (previewImg) {
+                    previewImg.src = e.target.result;
+                } else {
+                    // Create new image element if it doesn't exist
+                    const img = document.createElement('img');
+                    img.id = 'profile-preview';
+                    img.src = e.target.result;
+                    img.alt = 'Profile';
+                    img.className = 'profile-preview';
+                    img.style.cssText = 'width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid #e2e8f0;';
+                    document.querySelector('.profile-picture-container').appendChild(img);
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Show form errors if any
+    {% if p_form.errors %}
+    console.log('Form errors:', {{ p_form.errors|safe }});
+    {% endif %}
+</script>
+{% endblock %}

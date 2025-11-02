@@ -1,0 +1,230 @@
+{% extends "store/base.html" %}
+{% load render_table from django_tables2 %}
+{% load querystring from django_tables2 %}
+{% load static %}
+
+{% block title %}Bills{% endblock title %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4" style="background: #f8fafc; min-height: 100vh;">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <h2 class="text-primary mb-2" style="font-weight: 700;">Bills</h2>
+                            <p class="text-muted mb-0">Manage your business bills and expenses</p>
+                        </div>
+                        <div class="col-md-6 d-flex justify-content-end gap-2">
+                            <a class="btn btn-primary" href="{% url 'bill_create' %}">
+                                <i class="fas fa-plus me-2"></i> Add Bill
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Section -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <style>
+                        .modern-table {
+                            margin: 0;
+                        }
+                        .modern-table thead th {
+                            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+                            color: white;
+                            border: none;
+                            padding: 1rem;
+                            font-weight: 600;
+                            font-size: 0.9rem;
+                            text-transform: uppercase;
+                            letter-spacing: 0.5px;
+                        }
+                        .modern-table tbody tr {
+                            border-bottom: 1px solid #e2e8f0;
+                            transition: all 0.3s ease;
+                        }
+                        .modern-table tbody tr:hover {
+                            background-color: #f8fafc;
+                            transform: translateY(-1px);
+                            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                        }
+                        .modern-table tbody td {
+                            padding: 1rem;
+                            vertical-align: middle;
+                            border: none;
+                            color: #374151;
+                        }
+                        .modern-table tbody td:first-child {
+                            font-weight: 600;
+                            color: #1e40af;
+                        }
+                        .action-buttons {
+                            display: flex;
+                            gap: 0.5rem;
+                        }
+                        .btn-action {
+                            padding: 0.5rem 1rem;
+                            border-radius: 6px;
+                            font-size: 0.85rem;
+                            font-weight: 500;
+                            transition: all 0.3s ease;
+                        }
+                        .btn-edit {
+                            background: #dbeafe;
+                            color: #1d4ed8;
+                            border: 1px solid #bfdbfe;
+                        }
+                        .btn-edit:hover {
+                            background: #1d4ed8;
+                            color: white;
+                        }
+                        .btn-delete {
+                            background: #fee2e2;
+                            color: #dc2626;
+                            border: 1px solid #fecaca;
+                        }
+                        .btn-delete:hover {
+                            background: #dc2626;
+                            color: white;
+                        }
+                        .status-paid {
+                            background: #d1fae5;
+                            color: #059669;
+                            padding: 0.25rem 0.75rem;
+                            border-radius: 20px;
+                            font-size: 0.8rem;
+                            font-weight: 600;
+                        }
+                        .status-pending {
+                            background: #fef3c7;
+                            color: #d97706;
+                            padding: 0.25rem 0.75rem;
+                            border-radius: 20px;
+                            font-size: 0.8rem;
+                            font-weight: 600;
+                        }
+                        .amount-cell {
+                            font-weight: 600;
+                            color: #059669;
+                        }
+                        .contact-info {
+                            font-size: 0.9rem;
+                            color: #6b7280;
+                        }
+                        .description-cell {
+                            max-width: 200px;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            white-space: nowrap;
+                        }
+                    </style>
+                    <table class="table modern-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Bill ID</th>
+                                <th scope="col">Institution</th>
+                                <th scope="col">Description</th>
+                                <th scope="col">Contact</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Payment Details</th>
+                                <th scope="col">Amount</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for bill in bills %}
+                            <tr>
+                                <td>#{{ bill.id }}</td>
+                                <td>
+                                    <div class="fw-semibold">{{ bill.institution_name }}</div>
+                                </td>
+                                <td class="description-cell" title="{{ bill.description }}">
+                                    {{ bill.description|truncatechars:30 }}
+                                </td>
+                                <td class="contact-info">{{ bill.phone_number }}</td>
+                                <td class="contact-info">{{ bill.email|truncatechars:20 }}</td>
+                                <td class="contact-info">{{ bill.payment_details|truncatechars:20 }}</td>
+                                <td class="amount-cell">${{ bill.amount }}</td>
+                                <td>
+                                    {% if bill.status %}
+                                        <span class="status-paid">Paid</span>
+                                    {% else %}
+                                        <span class="status-pending">Pending</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a class="btn btn-action btn-edit" href="{% url 'bill_update' bill.slug %}">
+                                            <i class="fas fa-edit me-1"></i> Edit
+                                        </a>
+                                        <a class="btn btn-action btn-delete" href="{% url 'bill_delete' bill.pk %}">
+                                            <i class="fas fa-trash me-1"></i> Delete
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="mt-4">
+        {% if is_paginated %}
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </span>
+                </li>
+                {% endif %}
+                {% for i in paginator.page_range %}
+                {% if page_obj.number == i %}
+                <li class="page-item active" aria-current="page">
+                    <span class="page-link">{{ i }} <span class="visually-hidden">(current)</span></span>
+                </li>
+                {% else %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                </li>
+                {% endif %}
+                {% endfor %}
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </span>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock content %}

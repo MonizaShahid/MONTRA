@@ -1,0 +1,331 @@
+{% extends "store/base.html" %}
+{% load static %}
+{% block title %}Dashboard{% endblock title %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4" style="background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 100%); min-height: 100vh;">
+    <!-- Custom Header with Gradient -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); border-radius: 20px;">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center text-white">
+                        <div>
+                            <h2 class="mb-1" style="font-weight: 700; font-size: 2rem;">Welcome to MONTRA</h2>
+                            <p class="mb-0 opacity-75">Your business command center</p>
+                        </div>
+                        <div class="text-end">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <div class="small opacity-75">{{ request.user.username }}</div>
+                                    <div class="fw-semibold">{{ request.user.profile.role|default:"Staff" }}</div>
+                                </div>
+                                <div class="profile-avatar" style="width: 50px; height: 50px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Stats Widgets -->
+    <div class="row g-4 mb-4">
+        <style>
+            .stat-widget {
+                background: white;
+                border-radius: 20px;
+                padding: 2rem;
+                box-shadow: 0 10px 30px rgba(30, 64, 175, 0.1);
+                border: 1px solid rgba(30, 64, 175, 0.1);
+                transition: all 0.3s ease;
+                position: relative;
+                overflow: hidden;
+            }
+            .stat-widget:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 20px 40px rgba(30, 64, 175, 0.15);
+            }
+            .stat-widget::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: linear-gradient(90deg, #3b82f6, #1e40af);
+            }
+            .stat-icon {
+                width: 60px;
+                height: 60px;
+                border-radius: 15px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.5rem;
+                color: white;
+                margin-bottom: 1rem;
+                position: relative;
+            }
+            .stat-icon::after {
+                content: '';
+                position: absolute;
+                top: -5px;
+                right: -5px;
+                width: 20px;
+                height: 20px;
+                background: rgba(255,255,255,0.3);
+                border-radius: 50%;
+            }
+            .stat-number {
+                font-size: 2.5rem;
+                font-weight: 800;
+                margin-bottom: 0.5rem;
+                background: linear-gradient(135deg, #1e40af, #3b82f6);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+            .stat-label {
+                color: #64748b;
+                font-weight: 600;
+                font-size: 0.9rem;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+            .notification-badge {
+                position: absolute;
+                top: 15px;
+                right: 15px;
+                background: #ef4444;
+                color: white;
+                border-radius: 50%;
+                width: 25px;
+                height: 25px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.8rem;
+                font-weight: bold;
+                animation: pulse 2s infinite;
+            }
+            @keyframes pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.1); }
+                100% { transform: scale(1); }
+            }
+        </style>
+        
+        <div class="col-md-3 col-6">
+            <div class="stat-widget">
+                {% if total_items < 10 %}
+                <div class="notification-badge">!</div>
+                {% endif %}
+                <div class="stat-icon" style="background: linear-gradient(135deg, #3b82f6, #1e40af);">
+                    <i class="fas fa-box"></i>
+                </div>
+                <div class="stat-number">{{total_items|default:0}}</div>
+                <div class="stat-label">Items in Stock</div>
+                {% if total_items < 10 %}
+                <div class="mt-2">
+                    <small class="text-danger fw-semibold">Low Stock Alert!</small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="col-md-3 col-6">
+            <div class="stat-widget">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #10b981, #059669);">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="stat-number">{{total_sales|default:0}}</div>
+                <div class="stat-label">Total Sales</div>
+                <div class="mt-2">
+                    <small class="text-success fw-semibold">
+                        <i class="fas fa-arrow-up me-1"></i>${{total_revenue|floatformat:2}}
+                    </small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 col-6">
+            <div class="stat-widget">
+                {% if delivery.count > 0 %}
+                <div class="notification-badge">{{delivery.count}}</div>
+                {% endif %}
+                <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                    <i class="fas fa-truck"></i>
+                </div>
+                <div class="stat-number">{{delivery.count|default:0}}</div>
+                <div class="stat-label">Pending Orders</div>
+                {% if delivery.count > 0 %}
+                <div class="mt-2">
+                    <small class="text-warning fw-semibold">Needs Attention</small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="col-md-3 col-6">
+            <div class="stat-widget">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #06b6d4, #0891b2);">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-number">{{profiles_count|default:0}}</div>
+                <div class="stat-label">Team Members</div>
+                <div class="mt-2">
+                    <small class="text-info fw-semibold">
+                        <i class="fas fa-check-circle me-1"></i>Online
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Custom Activity Feed -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm" style="border-radius: 20px; background: white;">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="me-3">
+                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #3b82f6, #1e40af); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white;">
+                                <i class="fas fa-box"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h6 class="text-primary mb-1" style="font-weight: 700;">Recent Items</h6>
+                            <p class="text-muted mb-0 small">Latest inventory updates</p>
+                        </div>
+                    </div>
+                    
+                    <style>
+                        .activity-item {
+                            padding: 1rem;
+                            border-radius: 12px;
+                            margin-bottom: 0.5rem;
+                            transition: all 0.3s ease;
+                            border-left: 4px solid transparent;
+                        }
+                        .activity-item:hover {
+                            background: #f8fafc;
+                            border-left-color: #3b82f6;
+                            transform: translateX(5px);
+                        }
+                        .activity-item:last-child {
+                            margin-bottom: 0;
+                        }
+                        .item-name {
+                            font-weight: 600;
+                            color: #1e40af;
+                            margin-bottom: 0.25rem;
+                        }
+                        .item-category {
+                            font-size: 0.8rem;
+                            color: #64748b;
+                            margin-bottom: 0.5rem;
+                        }
+                        .item-stock {
+                            display: flex;
+                            align-items: center;
+                            justify-content: space-between;
+                        }
+                        .stock-badge {
+                            padding: 0.25rem 0.75rem;
+                            border-radius: 20px;
+                            font-size: 0.8rem;
+                            font-weight: 600;
+                        }
+                        .stock-high {
+                            background: #dcfce7;
+                            color: #166534;
+                        }
+                        .stock-medium {
+                            background: #fef3c7;
+                            color: #d97706;
+                        }
+                        .stock-low {
+                            background: #fee2e2;
+                            color: #dc2626;
+                        }
+                    </style>
+                    
+                    {% if items %}
+                        {% for item in items|slice:":5" %}
+                        <div class="activity-item">
+                            <div class="item-name">{{ item.name }}</div>
+                            <div class="item-category">{{ item.category.name }}</div>
+                            <div class="item-stock">
+                                <span class="text-muted small">Stock Level</span>
+                                <span class="stock-badge {% if item.quantity > 20 %}stock-high{% elif item.quantity > 5 %}stock-medium{% else %}stock-low{% endif %}">
+                                    {{ item.quantity }} units
+                                </span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <div style="width: 60px; height: 60px; background: #f1f5f9; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                                <i class="fas fa-box text-muted"></i>
+                            </div>
+                            <p class="text-muted">No items found</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm" style="border-radius: 20px; background: white;">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="me-3">
+                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white;">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h6 class="text-primary mb-1" style="font-weight: 700;">Recent Sales</h6>
+                            <p class="text-muted mb-0 small">Latest transactions</p>
+                        </div>
+                    </div>
+                    
+                    {% if sales %}
+                        {% for sale in sales|slice:":5" %}
+                        <div class="activity-item">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <div class="item-name">Sale #{{ sale.id }}</div>
+                                    <div class="item-category">{{ sale.customer|default:"Walk-in Customer" }}</div>
+                                </div>
+                                <div class="text-end">
+                                    <div class="fw-bold text-success">${{ sale.grand_total }}</div>
+                                    <div class="text-muted small">{{ sale.date_added|date:"M d, Y" }}</div>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <div class="me-2">
+                                    <div style="width: 8px; height: 8px; background: #10b981; border-radius: 50%;"></div>
+                                </div>
+                                <span class="text-success small fw-semibold">Completed</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <div style="width: 60px; height: 60px; background: #f1f5f9; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                                <i class="fas fa-shopping-cart text-muted"></i>
+                            </div>
+                            <p class="text-muted">No sales found</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
