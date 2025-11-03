@@ -77,22 +77,7 @@ MONTRA/
  └── app_folder/            # App files (views, models, templates)
 ```
 
-## 🚀 Uploading to GitHub Steps
 
-1. Open folder in VS Code
-2. Open terminal & run:
 
-```
-git init
-git add .
-git commit -m "Initial Commit"
-git branch -M main
-git remote add origin https://github.com/MonizaShahid/MONTRA.git
-git push -u origin main
-```
-
-## 🎉 Done!
-
-Your Django project is now uploaded and ready to run.
 
 
